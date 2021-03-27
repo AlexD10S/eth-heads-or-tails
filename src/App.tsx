@@ -1,8 +1,10 @@
 import React from 'react';
-import logo from './assets/images/ethereumLogo.png';
 // @ts-ignore
 import { Button } from 'rimble-ui'
 import './App.css';
+import TossCoin from './components/TossCoin';
+
+import logo from './assets/images/ethereumLogo.png';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         </p>
         <Button size={'medium'}>Play with a friend</Button>
         <Button size={'medium'}>Play with anyone</Button>
+
+        <TossCoin />
     </div>
   );
 }

@@ -1,24 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
+import logo from './assets/images/ethereumLogo.png';
+// @ts-ignore
+import { Button } from 'rimble-ui'
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+         Play the tails or heads game on Ethereum betting with friends or other people.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <Button size={'medium'}>Play with a friend</Button>
+        <Button size={'medium'}>Play with anyone</Button>
     </div>
   );
 }

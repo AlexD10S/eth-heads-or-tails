@@ -1,22 +1,37 @@
-import React from 'react';
+import React, {useState} from 'react';
 // @ts-ignore
-import { Button } from 'rimble-ui'
+import { Button,Heading } from 'rimble-ui';
 import './App.css';
-import TossCoin from './components/TossCoin';
+import GameBoard from './components/GameBoard';
 
 import logo from './assets/images/ethereumLogo.png';
 
 function App() {
+  const [hasGameStarted, setGameStarted] = useState(false);
+  
+
+  function playAgainstFriend(){
+    setGameStarted(true);
+  }
+  function playAgainstRandom(){
+    setGameStarted(true);
+  }
   return (
     <div className="App">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-         Play the tails or heads game on Ethereum betting with friends or other people.
-        </p>
-        <Button size={'medium'}>Play with a friend</Button>
-        <Button size={'medium'}>Play with anyone</Button>
-
-        <TossCoin />
+        <Heading as={"h1"}>Heads or Tails on Ethereum</Heading>
+        {!hasGameStarted && 
+          <>
+            <img src={logo} className="AppLogo" alt="logo" />
+            <Heading as={"h4"}>Play the tails or heads game on Ethereum betting with a friend or other people.</Heading>
+            <div className="ButtonContainer">
+              <Button size={'medium'} onClick={()=> playAgainstFriend()}>Play against a friend</Button>
+              <Button size={'medium'} onClick={()=> playAgainstRandom()}>Play against a random</Button>
+            </div>
+          </>
+        }
+        {hasGameStarted && 
+            <GameBoard />
+        }
     </div>
   );
 }

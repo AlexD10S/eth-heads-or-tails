@@ -49,8 +49,8 @@ export default TossCoin;
 
 const styles = {
     Coin: {
-       width: 32,
-       height: 32, 
+       width: 256,
+       height: 256, 
     },
     animationToss: {
         marginTop: 10 

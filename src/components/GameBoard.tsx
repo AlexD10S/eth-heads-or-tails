@@ -1,30 +1,76 @@
 import { useCallback, useEffect, useState } from "react";
 // @ts-ignore
-import { Button,Heading } from 'rimble-ui';
+import { Button,Heading, Input } from 'rimble-ui';
 import TossCoin from './TossCoin';
 import PickCoin from './PickCoin';
 
-function GameBoard() {
+interface Props {
+    isPlayingAgainstFriend: boolean;
+}
+function GameBoard(props: Props) {
     const [isMyTurn, setTurn] = useState(true);
+    const [friendAddress, setFriendAddress] = useState('');
+    const [coinPicked, setCoinPicked] = useState('');
+    useEffect(() => {
+        //get from SC if is my turn or not
+        let randomTurn = Math.random();
+        setTurn(randomTurn < 0.5)
+
+    },[]);
 
     async function send () {
-        console.log("");
+        console.log("send result");
+        //Send result to SC
+    }
+
+    function isReadyToSendTheElection(): boolean {
+        if(props.isPlayingAgainstFriend){
+            if(coinPicked !== '' && friendAddress !== '') return true;
+            return false;
+        }
+        else{
+            if(coinPicked !== '') return true;
+            return false;
+        }
+    }
+
+    function handleChangeAddress(e: any) {
+        setFriendAddress(e.target.value);
     }
 
     return(
         <div>
             {!isMyTurn &&
               <>
-                <Heading as={"h4"}>Is your turn to toss the coin, your adversary has already chosen.</Heading>
-                <TossCoin />
+                <Heading as={"h4"}>You have to toss the coin, your adversary has already chosen.</Heading>
+                <Heading as={"h6"}>{coinPicked === '' ? 
+                    "Click into the ETH coin to toss it." :
+                    'The result has been: ' + coinPicked}
+                </Heading>
+                <TossCoin coinPicked={coinPicked} setCoinPicked={setCoinPicked}/>
               </>
             }
             {isMyTurn &&
               <>
                 <Heading as={"h4"}>Pick your election, your adversary will toss the coin.</Heading>
-                <PickCoin />
+                <Heading as={"h6"}>Click into the coin you want to pick.</Heading>
+                <PickCoin coinPicked={coinPicked} setCoinPicked={setCoinPicked}/>
               </>
             }
+            {props.isPlayingAgainstFriend &&
+            <div>
+                    <Input
+                        type="text"
+                        required={true}
+                        placeholder="e.g. 0xAc03BB73b6a9e108530AFf4Df5077c2B3D481e5A"
+                        onChange={(handleChangeAddress)}
+                    />
+                    <Heading as={"h6"}>Paste your friend address here.</Heading>
+            </div>
+            }
+            <Button icon="Send" mr={3} disabled={!isReadyToSendTheElection()}>
+                Send
+            </Button>
         </div>
     );
 }
@@ -32,12 +78,3 @@ function GameBoard() {
 export default GameBoard;
 
 
-const styles = {
-    Coin: {
-       width: 32,
-       height: 32, 
-    },
-    animationToss: {
-        marginTop: 10 
-     },
-}

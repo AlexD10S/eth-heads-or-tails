@@ -8,13 +8,17 @@ import logo from './assets/images/ethereumLogo.png';
 
 function App() {
   const [hasGameStarted, setGameStarted] = useState(false);
+  const [isPlayingAgainstFriend, setPlayingAgainstFriend] = useState(false);
   
 
   function playAgainstFriend(){
     setGameStarted(true);
+    setPlayingAgainstFriend(true);
+
   }
   function playAgainstRandom(){
     setGameStarted(true);
+    setPlayingAgainstFriend(false);
   }
   return (
     <div className="App">
@@ -30,7 +34,9 @@ function App() {
           </>
         }
         {hasGameStarted && 
-            <GameBoard />
+            <>
+              <GameBoard isPlayingAgainstFriend={isPlayingAgainstFriend}/>
+            </>
         }
     </div>
   );

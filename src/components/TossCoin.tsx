@@ -4,27 +4,36 @@ import ethCoin from '../assets/images/ethCoin.png';
 import btcCoin from '../assets/images/btcCoin.png';
 import animationToss from '../assets/images/tossCoin.gif';
 
-function TossCoin() {
-    const [isHead, setHeadOrTails] = useState(true);
+interface Props {
+    coinPicked: string;
+    setCoinPicked: Function;
+} 
+function TossCoin(props: Props) {
     const [isTheCoinTossed, setCoinTossed] = useState(false);
 
     async function play () {
-        const randomNumber = await tossCoin();
-        const flipResult = tailsOrHeads(randomNumber);
-        console.log(flipResult);
+        const {coinPicked} = props;
+        if(coinPicked === ''){
+            const randomNumber = await tossCoin();
+            tailsOrHeads(randomNumber);
+        }
     }
 
     async function tossCoin(): Promise<number> {
         setCoinTossed(true);
         let flipResult = Math.random();
         await animationTimeout(3500);
-        setHeadOrTails(flipResult < 0.5);
         setCoinTossed(false);
         return flipResult;
     }
 
     function tailsOrHeads(flipResult: number): string {
-        if(flipResult < 0.5) return 'Heads';
+        const {setCoinPicked} = props;
+        if(flipResult < 0.5){
+            setCoinPicked('Heads');
+            return 'Heads';
+        }
+        setCoinPicked('Tails');
         return 'Tails'
     }
 
@@ -35,7 +44,7 @@ function TossCoin() {
     return(
         <div onClick={()=> play()}>
             {!isTheCoinTossed &&
-                <img src={isHead ? ethCoin : btcCoin} style={styles.Coin} alt="logo" />
+                <img src={props.coinPicked === 'Tails' ? btcCoin : ethCoin} style={styles.Coin} alt="logo" />
             }
             {isTheCoinTossed &&
                 <img src={animationToss} style={styles.animationToss} alt="logo" />
@@ -49,8 +58,9 @@ export default TossCoin;
 
 const styles = {
     Coin: {
-       width: 256,
-       height: 256, 
+       width: 196,
+       height: 196, 
+       marginBottom: 20,
     },
     animationToss: {
         marginTop: 10 

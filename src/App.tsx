@@ -22,7 +22,7 @@ function App() {
   }
   return (
     <div className="App">
-        <MetaMaskButton>Connect with MetaMask</MetaMaskButton>
+        <MetaMaskButton size="medium" className="MetamaskButton">Connect with MetaMask</MetaMaskButton> 
         <Heading as={"h1"}>Heads or Tails on Ethereum</Heading>
         {!hasGameStarted && 
           <>

@@ -5,43 +5,43 @@ import Web3 from 'web3';
 import TossCoin from './TossCoin';
 import PickCoin from './PickCoin';
 import HeadsOrTailsSC from "../blockchain/HeadsOrTailsSC";
+import {StartGame} from '../models/dtos';
+import * as utils from '../utils/utils';
 
 interface Props {
     friendAddress: string;
 }
 function GameBoard(props: Props) {
-    const [isMyTurn, setTurn] = useState(true);
+    const [isMyTurnToTossCoin, setTurn] = useState(true);
     const [coinPicked, setCoinPicked] = useState('');
-    useEffect(() => {
-        //get from SC if is my turn or not
-        const getIsMyTurn = async () => {
-            const sc = HeadsOrTailsSC.Instance;
-            console.log(props.friendAddress);
-            const commitment = await sc.getGameAgainstFriend(props.friendAddress);
-            console.log(commitment);
-        }
-        getIsMyTurn();
-        let randomTurn = Math.random();
-        setTurn(randomTurn < 0.5)
-    },[]);
 
     useEffect(() => {
-        const getAccountsFromBlockchain = async () => {
-            const web3 = new Web3(Web3.givenProvider)
-            const accounts = await web3.eth.getAccounts();
-            console.log(accounts);
+        const getIsMyTurn = async () => {
+            const sc = HeadsOrTailsSC.Instance;
+            const startGame: StartGame = await sc.getGameAgainstFriend(props.friendAddress);
+            setTurn(startGame.started)
         }
-        getAccountsFromBlockchain()
-    });
+        getIsMyTurn();
+    },[]);
 
     async function send () {
         console.log("send result");
-        //Send result to SC
+        if(isMyTurnToTossCoin){
+            //Send result of the coin tossed to SC
+        }
+        else{
+            //Calculate random, make hash with commitmennt and send to SC
+            console.log(coinPicked);
+            const coinValue = utils.getCoinValue(coinPicked);
+            const nonce = utils.generateRandom();
+            const commitment = utils.makeCommitment(coinValue, nonce);
+        }
+       
     }
 
     return(
         <div>
-            {!isMyTurn &&
+            {isMyTurnToTossCoin &&
               <>
                 <Heading as={"h4"}>You have to toss the coin, your adversary has already chosen.</Heading>
                 <Heading as={"h6"}>{coinPicked === '' ? 
@@ -51,14 +51,14 @@ function GameBoard(props: Props) {
                 <TossCoin coinPicked={coinPicked} setCoinPicked={setCoinPicked}/>
               </>
             }
-            {isMyTurn &&
+            {!isMyTurnToTossCoin &&
               <>
                 <Heading as={"h4"}>Pick your election, your adversary will toss the coin.</Heading>
                 <Heading as={"h6"}>Click into the coin you want to pick.</Heading>
                 <PickCoin coinPicked={coinPicked} setCoinPicked={setCoinPicked}/>
               </>
             }
-            <Button icon="Send" mr={3} disabled={coinPicked === ''}>
+            <Button icon="Send" mr={3} disabled={coinPicked === ''} onClick={()=> send()}>
                 Send
             </Button>
         </div>

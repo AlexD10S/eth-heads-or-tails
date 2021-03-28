@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { SC_ABI, SC_ADDRESS } from '../config/headsOrTailsSCData';
+import {StartGame} from '../models/dtos';
 
 
 export default class HeadsOrTailsSC {
@@ -20,19 +21,16 @@ export default class HeadsOrTailsSC {
 
     
     public async startGameAgainstFriend(friendAddress: string, commitment: string){
-        const a = await this.headsOrTailsContract.methods.startGameAgainstFriend(friendAddress, commitment).call();
-        console.log(a);
+        await this.headsOrTailsContract.methods.startGameAgainstFriend(friendAddress, commitment).call();
     }
 
-    public async getGameAgainstFriend(friendAddress: string): Promise<string> {
+    public async getGameAgainstFriend(friendAddress: string): Promise<StartGame> {
         try{
-        const a = await this.headsOrTailsContract.methods.getGameAgainstFriend(friendAddress).call();
-        console.log(a);
-        return "ok";
+            const commitment = await this.headsOrTailsContract.methods.getGameAgainstFriend(friendAddress).call();
+            return {started: true, commitment};
         }
         catch(error){
-            console.log(error);
-            return "ko";
+            return {started: false, commitment: ''};
         } 
     }
 }

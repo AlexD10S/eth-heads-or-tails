@@ -4,21 +4,21 @@ import { Button,Heading, Input } from 'rimble-ui';
 import Web3 from 'web3';
 import TossCoin from './TossCoin';
 import PickCoin from './PickCoin';
-import HeadsOrTailsSC from "../blockchain/headsOrTailsSC";
+import HeadsOrTailsSC from "../blockchain/HeadsOrTailsSC";
 
 interface Props {
-    isPlayingAgainstFriend: boolean;
-    friendAddress?: string;
+    friendAddress: string;
 }
 function GameBoard(props: Props) {
     const [isMyTurn, setTurn] = useState(true);
-    const [friendAddress, setFriendAddress] = useState('');
     const [coinPicked, setCoinPicked] = useState('');
     useEffect(() => {
         //get from SC if is my turn or not
         const getIsMyTurn = async () => {
             const sc = HeadsOrTailsSC.Instance;
-            const commitment = await sc.getGameAgainstFriend(friendAddress);
+            console.log(props.friendAddress);
+            const commitment = await sc.getGameAgainstFriend(props.friendAddress);
+            console.log(commitment);
         }
         getIsMyTurn();
         let randomTurn = Math.random();
@@ -37,21 +37,6 @@ function GameBoard(props: Props) {
     async function send () {
         console.log("send result");
         //Send result to SC
-    }
-
-    function isReadyToSendTheElection(): boolean {
-        if(props.isPlayingAgainstFriend){
-            if(coinPicked !== '' && friendAddress !== '') return true;
-            return false;
-        }
-        else{
-            if(coinPicked !== '') return true;
-            return false;
-        }
-    }
-
-    function handleChangeAddress(e: any) {
-        setFriendAddress(e.target.value);
     }
 
     return(
@@ -73,18 +58,7 @@ function GameBoard(props: Props) {
                 <PickCoin coinPicked={coinPicked} setCoinPicked={setCoinPicked}/>
               </>
             }
-            {props.isPlayingAgainstFriend &&
-            <div>
-                    <Input
-                        type="text"
-                        required={true}
-                        placeholder="e.g. 0xAc03BB73b6a9e108530AFf4Df5077c2B3D481e5A"
-                        onChange={(handleChangeAddress)}
-                    />
-                    <Heading as={"h6"}>Paste your friend address here.</Heading>
-            </div>
-            }
-            <Button icon="Send" mr={3} disabled={!isReadyToSendTheElection()}>
+            <Button icon="Send" mr={3} disabled={coinPicked === ''}>
                 Send
             </Button>
         </div>

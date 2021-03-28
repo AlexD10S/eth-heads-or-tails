@@ -6,23 +6,24 @@ import './App.css';
 import GameBoard from './components/GameBoard';
 
 import logo from './assets/images/ethereumLogo.png';
+import ModalAddress from './components/ModalAddress';
 declare const window: any;
 
 function App() {
   const [hasGameStarted, setGameStarted] = useState(false);
-  const [isPlayingAgainstFriend, setPlayingAgainstFriend] = useState(false);
   const [isConnectionSuccess, setConnectionSuccess] = useState(false);
   const [isConnectionFailed, setConnectionFailed] = useState(false);
+  const [friendAddress, setFriendAddress] = useState('');
+  const [isModalOpen, setModalOpen] = useState(false);
 
 
   function playAgainstFriend(){
-    setGameStarted(true);
-    setPlayingAgainstFriend(true);
+    setModalOpen(true);
 
   }
   function playAgainstRandom(){
     setGameStarted(true);
-    setPlayingAgainstFriend(false);
+    setFriendAddress('');
   }
 
   async function connectWithMetamask() {
@@ -37,6 +38,16 @@ function App() {
         setConnectionFailed(true);
       }
     }
+  }
+  function continueWithFriendAddress(address: string){
+    setModalOpen(false);
+    console.log("address")
+    console.log(address);
+    setFriendAddress(address);
+    setGameStarted(true);
+  }
+  function closeModal(){
+    setModalOpen(false);
   }
   
 
@@ -61,6 +72,11 @@ function App() {
       }
         <MetaMaskButton size="medium" className="MetamaskButton" onClick={()=> connectWithMetamask()}>Connect with MetaMask</MetaMaskButton> 
         <Heading as={"h1"}>Heads or Tails on Ethereum</Heading>
+        <ModalAddress 
+            isModalOpen={isModalOpen} 
+            methodToClose={()=> closeModal} 
+            methodToContinue={continueWithFriendAddress}
+        />
         {!hasGameStarted && 
           <>
             <img src={logo} className="AppLogo" alt="logo" />
@@ -73,7 +89,7 @@ function App() {
         }
         {hasGameStarted && 
             <>
-              <GameBoard isPlayingAgainstFriend={isPlayingAgainstFriend}/>
+              <GameBoard friendAddress={friendAddress}/>
             </>
         }
     </div>

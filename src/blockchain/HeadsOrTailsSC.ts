@@ -20,13 +20,13 @@ export default class HeadsOrTailsSC {
 
     
     public async startGameAgainstFriend(friendAddress: string, commitment: string){
-        const a = await this.headsOrTailsContract.methods.startGameAgainstFriend(friendAddress, commitment);
+        const a = await this.headsOrTailsContract.methods.startGameAgainstFriend(friendAddress, commitment).call();
         console.log(a);
     }
 
     public async getGameAgainstFriend(friendAddress: string): Promise<string> {
         try{
-        const a = await this.headsOrTailsContract.methods.startGameAgainstFriend(friendAddress);
+        const a = await this.headsOrTailsContract.methods.getGameAgainstFriend(friendAddress).call();
         console.log(a);
         return "ok";
         }

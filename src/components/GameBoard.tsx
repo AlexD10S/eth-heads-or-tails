@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 // @ts-ignore
 import { Button,Heading, Input } from 'rimble-ui';
-import Web3 from 'web3'
+import Web3 from 'web3';
 import TossCoin from './TossCoin';
 import PickCoin from './PickCoin';
+import HeadsOrTailsSC from "../blockchain/headsOrTailsSC";
 
 interface Props {
     isPlayingAgainstFriend: boolean;
+    friendAddress?: string;
 }
 function GameBoard(props: Props) {
     const [isMyTurn, setTurn] = useState(true);
@@ -14,13 +16,18 @@ function GameBoard(props: Props) {
     const [coinPicked, setCoinPicked] = useState('');
     useEffect(() => {
         //get from SC if is my turn or not
+        const getIsMyTurn = async () => {
+            const sc = HeadsOrTailsSC.Instance;
+            const commitment = await sc.getGameAgainstFriend(friendAddress);
+        }
+        getIsMyTurn();
         let randomTurn = Math.random();
         setTurn(randomTurn < 0.5)
     },[]);
 
     useEffect(() => {
         const getAccountsFromBlockchain = async () => {
-            const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
+            const web3 = new Web3(Web3.givenProvider)
             const accounts = await web3.eth.getAccounts();
             console.log(accounts);
         }

@@ -1,15 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 // @ts-ignore
-import { Button,Heading, MetaMaskButton } from 'rimble-ui';
+import { Button,Heading, MetaMaskButton, ToastMessage } from 'rimble-ui';
+
 import './App.css';
 import GameBoard from './components/GameBoard';
 
 import logo from './assets/images/ethereumLogo.png';
+declare const window: any;
 
 function App() {
   const [hasGameStarted, setGameStarted] = useState(false);
   const [isPlayingAgainstFriend, setPlayingAgainstFriend] = useState(false);
-  
+  const [isConnectionSuccess, setConnectionSuccess] = useState(false);
+  const [isConnectionFailed, setConnectionFailed] = useState(false);
+
 
   function playAgainstFriend(){
     setGameStarted(true);
@@ -20,9 +24,42 @@ function App() {
     setGameStarted(true);
     setPlayingAgainstFriend(false);
   }
+
+  async function connectWithMetamask() {
+    if (window.ethereum) {
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setConnectionSuccess(true);
+      } catch (error) {
+        if (error.code === 4001) {
+          // User rejected request
+        }
+        setConnectionFailed(true);
+      }
+    }
+  }
+  
+
   return (
     <div className="App">
-        <MetaMaskButton size="medium" className="MetamaskButton">Connect with MetaMask</MetaMaskButton> 
+      {isConnectionSuccess &&
+        <ToastMessage.Success
+          my={3}
+          message={"Connection successfully"}
+          secondaryMessage={"Connected with your Metamask Account"}
+          closeElem={true}
+          onClick={()=>setConnectionSuccess(false)}
+        />
+      }
+      {isConnectionFailed &&
+        <ToastMessage.Failure
+          my={3}
+          message={"Connection failed"}
+          secondaryMessage={"Something wrong with your connection"}
+          closeElem={true}
+        />
+      }
+        <MetaMaskButton size="medium" className="MetamaskButton" onClick={()=> connectWithMetamask()}>Connect with MetaMask</MetaMaskButton> 
         <Heading as={"h1"}>Heads or Tails on Ethereum</Heading>
         {!hasGameStarted && 
           <>

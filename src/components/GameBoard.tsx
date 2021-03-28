@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 // @ts-ignore
 import { Button,Heading, Input } from 'rimble-ui';
+import Web3 from 'web3'
 import TossCoin from './TossCoin';
 import PickCoin from './PickCoin';
 
@@ -15,8 +16,16 @@ function GameBoard(props: Props) {
         //get from SC if is my turn or not
         let randomTurn = Math.random();
         setTurn(randomTurn < 0.5)
-
     },[]);
+
+    useEffect(() => {
+        const getAccountsFromBlockchain = async () => {
+            const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
+            const accounts = await web3.eth.getAccounts();
+            console.log(accounts);
+        }
+        getAccountsFromBlockchain()
+    });
 
     async function send () {
         console.log("send result");

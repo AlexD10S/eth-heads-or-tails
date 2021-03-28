@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 // @ts-ignore
-import { Button,Heading } from 'rimble-ui';
+import { Button,Heading, MetaMaskButton } from 'rimble-ui';
 import './App.css';
 import GameBoard from './components/GameBoard';
 
@@ -22,6 +22,7 @@ function App() {
   }
   return (
     <div className="App">
+        <MetaMaskButton>Connect with MetaMask</MetaMaskButton>
         <Heading as={"h1"}>Heads or Tails on Ethereum</Heading>
         {!hasGameStarted && 
           <>

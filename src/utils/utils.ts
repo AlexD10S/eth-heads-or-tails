@@ -24,4 +24,11 @@ function makeCommitment(value: number, nonce: string) {
     return hash;
 
 }
-export {getCoinValue, generateRandom, makeCommitment}
+
+function verifyCommitment(commitment: string, value: number, nonce: string): boolean {
+    const web3 = new Web3();
+    const hash = web3.utils.soliditySha3({t: 'string', v: nonce}, {t: 'int8', v:value});
+    return (hash === commitment);
+
+}
+export {getCoinValue, generateRandom, makeCommitment, verifyCommitment}

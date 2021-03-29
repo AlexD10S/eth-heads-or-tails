@@ -14,6 +14,8 @@ interface Props {
 function GameBoard(props: Props) {
     const [isMyTurnToTossCoin, setTurn] = useState(true);
     const [coinPicked, setCoinPicked] = useState('');
+    const [coinValue, setCoinValue] = useState(0);
+    const [nonce, setNonce] = useState('');
 
     useEffect(() => {
         const getIsMyTurn = async () => {
@@ -27,16 +29,39 @@ function GameBoard(props: Props) {
 
     function setEvents(){
         const sc = HeadsOrTailsSC.Instance;
-        const coinTossed = sc.getCoinTossedEvent();
-        const proofSent = sc.getProofSentEvent();
-        coinTossed.watch(function(error: any, result: any) {
+        sc.getCoinTossedEvent(async function(error: any, result: any) {
             if (!error) {
-                console.log(result);
+                console.log("tossed received");
+                const friendAddress = result.returnValues._addressFriend;
+                const gameResult = result.returnValues.result;
+                if(gameResult === coinValue){
+                    console.log("I HAVE WON")
+                }
+                else{
+                    console.log("I HAVE LOST");
+                }
+                await sc.sendProof(friendAddress,nonce, coinValue);
             }
         });
-        proofSent.watch(function(error: any, result: any) {
+        sc.getProofSentEvent(function(error: any, result: any) {
             if (!error) {
-                console.log(result);
+                console.log("proof received");
+                console.log(result)
+                const coinPicked = result.returnValues.coinPicked;
+                const commitment = result.returnValues.commitment;
+                const nonce = result.returnValues.nonce;
+                if(utils.verifyCommitment(commitment, coinPicked, nonce)){
+                    console.log("PROOF VERIFIED");
+                    if(coinPicked === coinValue){
+                        console.log("I HAVE WON")
+                    }
+                    else{
+                        console.log("I HAVE LOST");
+                    }
+                }
+                else{
+                    console.log("PROOF NOT VERIFIED");
+                }
             }
         });
     }
@@ -45,14 +70,14 @@ function GameBoard(props: Props) {
         try{
             if(isMyTurnToTossCoin){
                 //Send result of the coin tossed to SC
-                const coinValue = utils.getCoinValue(coinPicked);
+                setCoinValue(utils.getCoinValue(coinPicked));
                 const sc = HeadsOrTailsSC.Instance;
                 await sc.sendResult(coinValue);
             }
             else{
                 //Calculate random, make hash with commitment and send to SC
-                const coinValue = utils.getCoinValue(coinPicked);
-                const nonce = utils.generateRandom();
+                setCoinValue(utils.getCoinValue(coinPicked));
+                setNonce(utils.generateRandom());
                 const commitment = utils.makeCommitment(coinValue, nonce);
                 const sc = HeadsOrTailsSC.Instance;
                 if(commitment){

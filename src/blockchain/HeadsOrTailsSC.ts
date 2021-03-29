@@ -47,17 +47,27 @@ export default class HeadsOrTailsSC {
         } 
     }
 
+    public async sendProof(friendAddress: any, nonce: string, coinValue: number) {
+        try{
+            const myAccount = await this.getMyAcccount();
+            await this.headsOrTailsContract.methods._sendProof(friendAddress, nonce, coinValue).send({from: myAccount});
+        }
+        catch(error){
+            console.log(error);
+        } 
+    }
+
     public async getFriendsGames(){
         const acccounts = await this.web3.eth.getAccounts();
         const myGames = await this.headsOrTailsContract.methods.friendGames(acccounts[0]).call();
         return myGames;
     }
 
-    public getCoinTossedEvent(){
-        return this.headsOrTailsContract.CoinTossed();
+    public getCoinTossedEvent(callback: Function){
+        return this.headsOrTailsContract.events.CoinTossed(callback);
     }
-    public getProofSentEvent(){
-        return this.headsOrTailsContract.ProofSent();
+    public getProofSentEvent(callback: Function){
+        return this.headsOrTailsContract.events.ProofSent(callback);
     }
 
     private async getMyAcccount(): Promise<string> {

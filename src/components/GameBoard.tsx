@@ -18,20 +18,39 @@ function GameBoard(props: Props) {
     useEffect(() => {
         const getIsMyTurn = async () => {
             const sc = HeadsOrTailsSC.Instance;
-            sc.getFriendsGames();
             const game: StartGame = await sc.getGameAgainstFriend(props.friendAddress);
             setTurn(game.started)
         }
         getIsMyTurn();
+        setEvents();
     },[]);
+
+    function setEvents(){
+        const sc = HeadsOrTailsSC.Instance;
+        const coinTossed = sc.getCoinTossedEvent();
+        const proofSent = sc.getProofSentEvent();
+        coinTossed.watch(function(error: any, result: any) {
+            if (!error) {
+                console.log(result);
+            }
+        });
+        proofSent.watch(function(error: any, result: any) {
+            if (!error) {
+                console.log(result);
+            }
+        });
+    }
 
     async function send () {
         try{
             if(isMyTurnToTossCoin){
                 //Send result of the coin tossed to SC
+                const coinValue = utils.getCoinValue(coinPicked);
+                const sc = HeadsOrTailsSC.Instance;
+                await sc.sendResult(coinValue);
             }
             else{
-                //Calculate random, make hash with commitmennt and send to SC
+                //Calculate random, make hash with commitment and send to SC
                 const coinValue = utils.getCoinValue(coinPicked);
                 const nonce = utils.generateRandom();
                 const commitment = utils.makeCommitment(coinValue, nonce);

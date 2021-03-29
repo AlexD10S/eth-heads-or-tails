@@ -25,12 +25,6 @@ export default class HeadsOrTailsSC {
         await this.headsOrTailsContract.methods.startGameAgainstFriend(friendAddress, commitment).send({from: myAccount});
     }
 
-    public async getFriendsGames(){
-        const acccounts = await this.web3.eth.getAccounts();
-        const myGames = await this.headsOrTailsContract.methods.friendGames(acccounts[0]).call();
-        return myGames;
-    }
-
     public async getGameAgainstFriend(friendAddress: any): Promise<StartGame> {
         try{
             const myAccount = await this.getMyAcccount();
@@ -43,7 +37,30 @@ export default class HeadsOrTailsSC {
         } 
     }
 
-    public async getMyAcccount(): Promise<string> {
+    public async sendResult(result: number) {
+        try{
+            const myAccount = await this.getMyAcccount();
+            await this.headsOrTailsContract.methods.sendResult(result).send({from: myAccount});
+        }
+        catch(error){
+            console.log(error);
+        } 
+    }
+
+    public async getFriendsGames(){
+        const acccounts = await this.web3.eth.getAccounts();
+        const myGames = await this.headsOrTailsContract.methods.friendGames(acccounts[0]).call();
+        return myGames;
+    }
+
+    public getCoinTossedEvent(){
+        return this.headsOrTailsContract.CoinTossed();
+    }
+    public getProofSentEvent(){
+        return this.headsOrTailsContract.ProofSent();
+    }
+
+    private async getMyAcccount(): Promise<string> {
         const acccounts = await this.web3.eth.getAccounts();
         return acccounts[0];
     }

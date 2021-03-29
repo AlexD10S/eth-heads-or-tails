@@ -9,7 +9,7 @@ import {StartGame} from '../models/dtos';
 import * as utils from '../utils/utils';
 
 interface Props {
-    friendAddress: string;
+    friendAddress: any;
 }
 function GameBoard(props: Props) {
     const [isMyTurnToTossCoin, setTurn] = useState(true);
@@ -18,23 +18,32 @@ function GameBoard(props: Props) {
     useEffect(() => {
         const getIsMyTurn = async () => {
             const sc = HeadsOrTailsSC.Instance;
-            const startGame: StartGame = await sc.getGameAgainstFriend(props.friendAddress);
-            setTurn(startGame.started)
+            sc.getFriendsGames();
+            const game: StartGame = await sc.getGameAgainstFriend(props.friendAddress);
+            setTurn(game.started)
         }
         getIsMyTurn();
     },[]);
 
     async function send () {
-        console.log("send result");
-        if(isMyTurnToTossCoin){
-            //Send result of the coin tossed to SC
+        try{
+            if(isMyTurnToTossCoin){
+                //Send result of the coin tossed to SC
+            }
+            else{
+                //Calculate random, make hash with commitmennt and send to SC
+                const coinValue = utils.getCoinValue(coinPicked);
+                const nonce = utils.generateRandom();
+                const commitment = utils.makeCommitment(coinValue, nonce);
+                const sc = HeadsOrTailsSC.Instance;
+                if(commitment){
+                    await sc.startGameAgainstFriend(props.friendAddress,commitment);
+                }
+            }
         }
-        else{
-            //Calculate random, make hash with commitmennt and send to SC
-            console.log(coinPicked);
-            const coinValue = utils.getCoinValue(coinPicked);
-            const nonce = utils.generateRandom();
-            const commitment = utils.makeCommitment(coinValue, nonce);
+        catch(error){
+            console.log("Error");
+            console.log(error);
         }
        
     }

@@ -50,7 +50,17 @@ export default class HeadsOrTailsSC {
     public async sendProof(friendAddress: any, nonce: string, coinValue: number) {
         try{
             const myAccount = await this.getMyAcccount();
-            await this.headsOrTailsContract.methods._sendProof(friendAddress, nonce, coinValue).send({from: myAccount});
+            await this.headsOrTailsContract.methods.sendProof(friendAddress, nonce, coinValue).send({from: myAccount});
+        }
+        catch(error){
+            console.log(error);
+        } 
+    }
+
+    public async deleteGame() {
+        try{
+            const myAccount = await this.getMyAcccount();
+            await this.headsOrTailsContract.methods.deleteGameAgainstFriend().send({from: myAccount});
         }
         catch(error){
             console.log(error);

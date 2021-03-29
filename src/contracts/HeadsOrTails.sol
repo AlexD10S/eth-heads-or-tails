@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 contract HeadsOrTails {
     
-    event CoinTossed(address player, uint result, address _addressFriend);
+    event CoinTossed(address player, uint result, address addressFriend);
     event ProofSent(string nonce, uint coinPicked, string commitment);
     
     struct Game {
@@ -18,14 +18,14 @@ contract HeadsOrTails {
     //mapping(address => mapping(address => Game)) friendGames; More than one game per player?
     Game [] public waitingListPlayers; //convert to mapping? better to delete itemsç
     
-    /*modifier resultOnlyOnce() {
-        require(friendGames[msg.sender].result == 0); //Result must be 0, this stop anyone to modify the value
-        _;
-    }*/
      
     function startGameAgainstFriend(address _addressFriend, string memory _commitment) external {
         require(friendGames[_addressFriend].player == address(0)); //Check my friend is free
         friendGames[_addressFriend] = Game(msg.sender,_commitment,"",0,0);
+    }
+    
+    function deleteGameAgainstFriend() external {
+        delete friendGames[msg.sender]; //Just the player after check the proof cann delete it
     }
     
     function getGameAgainstFriend(address _addressFriend) external view returns (string memory){
@@ -43,7 +43,7 @@ contract HeadsOrTails {
         return friendGames[_addressFriend].result; 
     }
     
-    function _sendProof(address _addressFriend, string memory _nonce, uint8 _coinPicked) external {
+    function sendProof(address _addressFriend, string memory _nonce, uint8 _coinPicked) external {
         require(friendGames[_addressFriend].player == msg.sender); //Just can send the proof if is a participant of the game
         friendGames[_addressFriend].nonce = _nonce;
         friendGames[_addressFriend].coinPicked = _coinPicked;

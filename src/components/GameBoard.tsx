@@ -32,7 +32,7 @@ function GameBoard(props: Props) {
         sc.getCoinTossedEvent(async function(error: any, result: any) {
             if (!error) {
                 console.log("tossed received");
-                const friendAddress = result.returnValues._addressFriend;
+                const friendAddress = result.returnValues.addressFriend;
                 const gameResult = result.returnValues.result;
                 if(gameResult === coinValue){
                     console.log("I HAVE WON")

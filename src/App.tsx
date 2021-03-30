@@ -4,13 +4,13 @@ import { Button,Heading, MetaMaskButton, ToastMessage } from 'rimble-ui';
 
 import './App.css';
 import GameBoard from './components/GameBoard';
-
 import logo from './assets/images/ethereumLogo.png';
 import ModalAddress from './components/ModalAddress';
 declare const window: any;
 
 function App() {
   const [hasGameStarted, setGameStarted] = useState(false);
+  const [resultGame, setResultGame] = useState('');
   const [isConnectionSuccess, setConnectionSuccess] = useState(false);
   const [isConnectionFailed, setConnectionFailed] = useState(false);
   const [friendAddress, setFriendAddress] = useState('');
@@ -41,8 +41,6 @@ function App() {
   }
   function continueWithFriendAddress(address: string){
     setModalOpen(false);
-    console.log("address")
-    console.log(address);
     setFriendAddress(address);
     setGameStarted(true);
   }
@@ -87,9 +85,15 @@ function App() {
             </div>
           </>
         }
-        {hasGameStarted && 
+        {(hasGameStarted && resultGame === '')  &&
             <>
-              <GameBoard friendAddress={friendAddress}/>
+              <GameBoard friendAddress={friendAddress} setResultGame={setResultGame}/>
+            </>
+        }
+         {(hasGameStarted && resultGame !== '')  &&
+            <>
+              <img src={logo} className="AppLogo" alt="logo" />
+              <Heading as={"h4"}>You have {resultGame} !.</Heading>
             </>
         }
     </div>

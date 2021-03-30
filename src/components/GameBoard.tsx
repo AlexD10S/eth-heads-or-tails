@@ -10,12 +10,14 @@ import * as utils from '../utils/utils';
 
 interface Props {
     friendAddress: any;
+    setResultGame: Function;
 }
 function GameBoard(props: Props) {
     const [isMyTurnToTossCoin, setTurn] = useState(true);
     const [coinPicked, setCoinPicked] = useState('');
     const [coinValue, setCoinValue] = useState(0);
     const [nonce, setNonce] = useState('');
+    const [waitingProof, setWaitingProof] = useState(false);
 
     useEffect(() => {
         const getIsMyTurn = async () => {
@@ -30,21 +32,21 @@ function GameBoard(props: Props) {
     function setEvents(){
         const sc = HeadsOrTailsSC.Instance;
         sc.getCoinTossedEvent(async function(error: any, result: any) {
-            if (!error) {
+            if (!error && !waitingProof) {
                 console.log("tossed received");
                 const friendAddress = result.returnValues.addressFriend;
                 const gameResult = result.returnValues.result;
                 if(gameResult === coinValue){
-                    console.log("I HAVE WON")
+                    props.setResultGame('WON');
                 }
                 else{
-                    console.log("I HAVE LOST");
+                    props.setResultGame('LOST');
                 }
                 await sc.sendProof(friendAddress,nonce, coinValue);
             }
         });
-        sc.getProofSentEvent(function(error: any, result: any) {
-            if (!error) {
+        sc.getProofSentEvent(async function(error: any, result: any) {
+            if (!error && waitingProof) {
                 console.log("proof received");
                 console.log(result)
                 const coinPicked = result.returnValues.coinPicked;
@@ -52,11 +54,12 @@ function GameBoard(props: Props) {
                 const nonce = result.returnValues.nonce;
                 if(utils.verifyCommitment(commitment, coinPicked, nonce)){
                     console.log("PROOF VERIFIED");
+                    await sc.deleteGame();
                     if(coinPicked === coinValue){
-                        console.log("I HAVE WON")
+                        props.setResultGame('WON');
                     }
                     else{
-                        console.log("I HAVE LOST");
+                        props.setResultGame('LOST');
                     }
                 }
                 else{
@@ -73,6 +76,7 @@ function GameBoard(props: Props) {
                 setCoinValue(utils.getCoinValue(coinPicked));
                 const sc = HeadsOrTailsSC.Instance;
                 await sc.sendResult(coinValue);
+                setWaitingProof(true);
             }
             else{
                 //Calculate random, make hash with commitment and send to SC
@@ -83,6 +87,7 @@ function GameBoard(props: Props) {
                 if(commitment){
                     await sc.startGameAgainstFriend(props.friendAddress,commitment);
                 }
+                setWaitingProof(false);
             }
         }
         catch(error){
